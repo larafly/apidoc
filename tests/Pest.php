@@ -1,5 +1,5 @@
 <?php
 
-use Larafly\ApiDoc\Tests\TestCase;
+use Larafly\Apidoc\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);

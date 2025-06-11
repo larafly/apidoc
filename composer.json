@@ -33,13 +33,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Larafly\\ApiDoc\\": "src/",
-            "Larafly\\ApiDoc\\Database\\Factories\\": "database/factories/"
+            "Larafly\\Apidoc\\": "src/",
+            "Larafly\\Apidoc\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Larafly\\ApiDoc\\Tests\\": "tests/"
+            "Larafly\\Apidoc\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -60,7 +60,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Larafly\\ApiDoc\\ApiDocServiceProvider"
+                "Larafly\\Apidoc\\ApidocServiceProvider"
             ]
         }
     },

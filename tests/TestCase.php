@@ -1,10 +1,10 @@
 <?php
 
-namespace Larafly\ApiDoc\Tests;
+namespace Larafly\Apidoc\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Larafly\ApiDoc\ApiDocServiceProvider;
+use Larafly\Apidoc\ApidocServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -20,7 +20,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            ApiDocServiceProvider::class,
+            ApidocServiceProvider::class,
         ];
     }
 
