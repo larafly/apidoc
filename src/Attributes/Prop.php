@@ -8,7 +8,7 @@ class Prop
     public string $desc;//字段说明
     public string $example;//代码示例
 
-    public function __construct(string $desc,string $example='')
+    public function __construct(string $desc,string|int $example='')
     {
         $this->desc = $desc;
         $this->example = $example;
