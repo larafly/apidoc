@@ -5,10 +5,8 @@ namespace Larafly\Apidoc\Attributes;
 #[\Attribute(\Attribute::TARGET_METHOD)]
 class Api
 {
-    public string $name;
 
-    public function __construct(string $name)
+    public function __construct(public string $name,public string $desc='')
     {
-        $this->name = $name;
     }
 }
