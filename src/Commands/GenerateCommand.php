@@ -9,6 +9,7 @@ use Larafly\Apidoc\Attributes\Group;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\Finder\Finder;
+
 class GenerateCommand extends Command
 {
     public $signature = 'apidoc:generate';
@@ -18,8 +19,9 @@ class GenerateCommand extends Command
     public function handle(): int
     {
         $this->comment('All done');
-//        $this->scan();
+        //        $this->scan();
         $this->getInfo();
+
         return self::SUCCESS;
     }
 
@@ -27,10 +29,10 @@ class GenerateCommand extends Command
     {
         $routes = Route::getRoutes();
         $controllerInfos = collect($routes)
-            ->filter(fn($route) => isset($route->getAction()['controller']))
+            ->filter(fn ($route) => isset($route->getAction()['controller']))
             ->map(function ($route) {
                 $actionName = $route->getActionName();
-                if (!str_contains($actionName, '@')) {
+                if (! str_contains($actionName, '@')) {
                     return null; // 非 controller 路由，跳过
                 }
                 [$controller, $method] = explode('@', $actionName);
@@ -44,14 +46,14 @@ class GenerateCommand extends Command
             })
             ->groupBy('controller')  // 按 controller 分组，方便处理
             ->map(function ($methods, $controller) {
-                if (!class_exists($controller)) {
+                if (! class_exists($controller)) {
                     return null;
                 }
                 $reflection = new ReflectionClass($controller);
 
                 // 判断是否有 #[Group]
                 $groupAttr = collect($reflection->getAttributes(Group::class))->first();
-                if (!$groupAttr) {
+                if (! $groupAttr) {
                     return null;
                 }
 
@@ -61,14 +63,14 @@ class GenerateCommand extends Command
 
                 foreach ($methods as $methodInfo) {
                     $methodName = $methodInfo['controller_method'];
-                    if (!$reflection->hasMethod($methodName)) {
+                    if (! $reflection->hasMethod($methodName)) {
                         continue;
                     }
 
                     $method = $reflection->getMethod($methodName);
                     $apiAttr = collect($method->getAttributes(Api::class))->first();
-                    if($apiAttr){
-                        $apiName = $apiAttr->newInstance()->name??'';
+                    if ($apiAttr) {
+                        $apiName = $apiAttr->newInstance()->name ?? '';
 
                         $apis[] = [
                             'uri' => $methodInfo['uri'],
@@ -78,7 +80,6 @@ class GenerateCommand extends Command
                             'api_name' => $apiName,
                         ];
                     }
-
 
                 }
 
@@ -92,16 +93,17 @@ class GenerateCommand extends Command
             ->values();
         dump($controllerInfos);
     }
+
     public function scan()
     {
-        $finder = new Finder();
+        $finder = new Finder;
         $controller_path = app_path('Http/Controllers');
         $finder->files()->in($controller_path)->name('*.php');
 
         foreach ($finder as $file) {
             $class = $this->getFullClassNameFromFile($file->getRealPath());
 
-            if (!$class || !class_exists($class)) {
+            if (! $class || ! class_exists($class)) {
                 continue;
             }
 
@@ -116,7 +118,7 @@ class GenerateCommand extends Command
             /** @var Group $groupInstance */
             $groupInstance = $groupAttributes[0]->newInstance();
             dump($groupInstance);
-//            $categoryId = $this->createOrGetCategoryByPath($groupInstance->name);
+            //            $categoryId = $this->createOrGetCategoryByPath($groupInstance->name);
 
             // 遍历方法，读取 Api 属性
             foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
@@ -128,7 +130,7 @@ class GenerateCommand extends Command
                 $apiInstance = $apiAttributes[0]->newInstance();
                 dump($apiInstance);
 
-//                $this->createOrUpdateApi($apiInstance->desc, $categoryId, $class, $method->getName());
+                //                $this->createOrUpdateApi($apiInstance->desc, $categoryId, $class, $method->getName());
             }
         }
     }
@@ -140,9 +142,10 @@ class GenerateCommand extends Command
         if (preg_match('/namespace\s+([^;]+);/', $content, $m)) {
             $namespace = $m[1];
             if (preg_match('/class\s+(\w+)/', $content, $m2)) {
-                return $namespace . '\\' . $m2[1];
+                return $namespace.'\\'.$m2[1];
             }
         }
+
         return null;
     }
 
@@ -154,7 +157,7 @@ class GenerateCommand extends Command
 
         $fullPath = '';
         foreach ($segments as $segment) {
-            $fullPath .= $segment . '/';
+            $fullPath .= $segment.'/';
 
             // 去除结尾 /
             $searchPath = rtrim($fullPath, '/');
@@ -162,13 +165,14 @@ class GenerateCommand extends Command
             // 查询缓存或数据库是否已存在
             if (isset($this->categoryCache[$searchPath])) {
                 $parentId = $this->categoryCache[$searchPath];
+
                 continue;
             }
 
             // 假设 Category 是你的模型，字段有：id, name, parent_id
             $category = Category::where('name', $segment)->where('parent_id', $parentId)->first();
 
-            if (!$category) {
+            if (! $category) {
                 $category = Category::create([
                     'name' => $segment,
                     'parent_id' => $parentId,

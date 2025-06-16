@@ -4,8 +4,8 @@ namespace Larafly\Apidoc\Controllers;
 
 class ApidocController
 {
-
-    public function index(){
+    public function index()
+    {
         return view('larafly-apidoc::index');
     }
 }

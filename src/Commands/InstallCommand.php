@@ -3,8 +3,6 @@
 namespace Larafly\Apidoc\Commands;
 
 use Illuminate\Console\Command;
-use Foryoufeng\Generator\Database\GeneratorSeeder;
-use Foryoufeng\Generator\GeneratorServiceProvider;
 
 class InstallCommand extends Command
 {
@@ -31,6 +29,6 @@ class InstallCommand extends Command
     {
         $this->call('migrate');
         $this->info('Apidoc installed successfully.');
-        $this->info('🌐 access url: ' . route('larafly-apidoc.index'));
+        $this->info('🌐 access url: '.route('larafly-apidoc.index'));
     }
 }

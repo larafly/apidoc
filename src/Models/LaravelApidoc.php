@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- *
- *
  * @property int $id
  * @property int $laravel_apidoc_type_id apidoc type id
  * @property string $name name
@@ -17,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $response_data response data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LaravelApidoc newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LaravelApidoc newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LaravelApidoc query()
@@ -29,12 +28,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LaravelApidoc whereResponseData($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LaravelApidoc whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|LaravelApidoc whereUrl($value)
+ *
  * @mixin \Eloquent
  */
 class LaravelApidoc extends Model
 {
-
-    public function laravel_api_doc_type():BelongsTo
+    public function laravel_api_doc_type(): BelongsTo
     {
         return $this->belongsTo(LaravelApiDocType::class);
     }

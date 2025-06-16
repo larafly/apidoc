@@ -56,7 +56,7 @@ class ApiResponse implements Responsable
 
     public static function fromModel(?Model $model): array
     {
-        if(!$model){
+        if (! $model) {
             return [];
         }
         $class = new ReflectionClass(static::class);
@@ -89,7 +89,7 @@ class ApiResponse implements Responsable
                 $type = $meta->type;
                 if (class_exists($type) && is_subclass_of($type, __CLASS__)) {
                     if ($model->$name instanceof Collection) {
-                        //get current type collection reflect models
+                        // get current type collection reflect models
                         $args[$name] = $model->$name->map(fn (Model $item) => $type::fromModel($item));
                     }
                 }

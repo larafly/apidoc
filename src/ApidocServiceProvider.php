@@ -13,7 +13,7 @@ class ApidocServiceProvider extends ServiceProvider
         // Publishing the views.
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'larafly-apidoc');
 
-        //the language
+        // the language
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'larafly-apidoc');
 
         // load migrations
@@ -22,9 +22,9 @@ class ApidocServiceProvider extends ServiceProvider
         // Publishing apidoc files.
         $this->publishes([
             __DIR__.'/../config/larafly-apidoc.php' => config_path('larafly-apidoc.php'),
-        ],'larafly-apidoc');
+        ], 'larafly-apidoc');
 
-        //routes
+        // routes
         $this->loadRoutesFrom(__DIR__.'/../routes/route.php');
 
         if ($this->app->runningInConsole()) {
