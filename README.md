@@ -20,13 +20,13 @@ We highly appreciate you sending us a postcard from your hometown, mentioning wh
 You can install the package via composer:
 
 ```bash
-composer require larafly-apidoc/larafly-apidoc
+composer require larafly/apidoc
 ```
 
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag="larafly-apidoc-migrations"
+php artisan vendor:publish --tag="larafly-apidoc"
 php artisan migrate
 ```
 

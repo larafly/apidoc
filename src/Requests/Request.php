@@ -20,10 +20,10 @@ abstract class Request extends FormRequest
             $propertyType = (new ReflectionProperty($this, $key))->getType();
 
             if ($propertyType instanceof ReflectionNamedType && ! $propertyType->isBuiltin()) {
-                // 如果是自定义类，构造对象数组
+                // If it's a custom class, construct an array of objects.
                 $className = $propertyType->getName();
                 if (enum_exists($className)) {
-                    // 是 enum，使用 ::from 构造
+                    // if type is  enum，use ::from to set key
                     $this->{$key} = $className::from($value);
                 } elseif (is_array($value) && array_is_list($value)) {
                     $this->{$key} = array_map(fn ($v) => new $className(...$v), $value);

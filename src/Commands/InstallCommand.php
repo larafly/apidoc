@@ -30,10 +30,7 @@ class InstallCommand extends Command
     public function handle()
     {
         $this->call('migrate');
-        //add default seeds
-        $this->call('db:seed', ['--class' => GeneratorSeeder::class]);
-        $this->info('Generator installed successfully.');
-        $host = config('app.url');
-        $this->info('🌐 access url: ' . route('generator.index'));
+        $this->info('Apidoc installed successfully.');
+        $this->info('🌐 access url: ' . route('larafly-apidoc.index'));
     }
 }
