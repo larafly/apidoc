@@ -38,7 +38,8 @@ class ApidocCommand extends Command
                     return null; // if not controller method route then break
                 }
                 [$controller, $method] = explode('@', $actionName);
-                $request_method = array_filter($route->methods(), fn($m) => in_array($m, ['GET', 'POST', 'PUT', 'DELETE']))[0]??'';
+                $request_method = array_filter($route->methods(), fn ($m) => in_array($m, ['GET', 'POST', 'PUT', 'DELETE']))[0] ?? '';
+
                 return [
                     'uri' => $route->uri(),
                     'method' => $request_method,
@@ -59,7 +60,7 @@ class ApidocCommand extends Command
                     return null;
                 }
 
-                $groupName = $groupAttr->newInstance()->name??'';
+                $groupName = $groupAttr->newInstance()->name ?? '';
                 $api_methods = [];
                 $alias = RouteUtil::getControllerAlias($controller);
 
@@ -97,9 +98,10 @@ class ApidocCommand extends Command
                 $apidoc_type = LaraflyApidocType::firstOrNew(['alias' => $api['alias']]);
                 $apidoc_type->name = $api['name'];
                 dump();
-                if($apidoc_type->save()){
+                if ($apidoc_type->save()) {
 
                 }
+
                 return $api;
             });
         dump($controllerInfos);

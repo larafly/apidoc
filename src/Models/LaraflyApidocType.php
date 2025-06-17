@@ -25,7 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class LaraflyApidocType extends Model
 {
-    protected $fillable = ['name','alias'];
+    protected $fillable = ['name', 'alias'];
+
     public function laravel_api_doc(): HasMany
     {
         return $this->hasMany(LaraflyApidoc::class);

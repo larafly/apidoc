@@ -9,9 +9,8 @@ class RouteUtil
 {
     /**
      * use controller and method to return route info
-     * @param  string  $controllerClass
-     * @param  string  $methodName
-     * @return array   route info
+     *
+     * @return array route info
      */
     public static function getRoute(string $controllerClass, string $methodName): array
     {
@@ -25,7 +24,7 @@ class RouteUtil
 
                 if ($class === $controllerClass && $method === $methodName) {
                     $uri = $route->uri();
-                    $method = array_filter($route->methods(), fn($m) => in_array($m, ['GET', 'POST', 'PUT', 'DELETE']))[0]??'';
+                    $method = array_filter($route->methods(), fn ($m) => in_array($m, ['GET', 'POST', 'PUT', 'DELETE']))[0] ?? '';
                     $matchedRoute = [
                         'uri' => $uri,
                         'method' => $method,
@@ -41,14 +40,14 @@ class RouteUtil
 
     /**
      * get full url
-     * @param  string  $uri
-     * @return string  full url
+     *
+     * @return string full url
      */
     public static function getFullRouteUrl(string $uri): string
     {
         $appUrl = rtrim(config('app.url'), '/');
 
-        return $appUrl . '/' . ltrim($uri, '/');
+        return $appUrl.'/'.ltrim($uri, '/');
     }
 
     public static function getControllerAlias($controllerClass): string
@@ -65,5 +64,4 @@ class RouteUtil
         // translate to lower
         return strtolower($controllerClass);
     }
-
 }
