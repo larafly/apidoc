@@ -6,13 +6,15 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Route;
 use Larafly\Apidoc\Attributes\Api;
 use Larafly\Apidoc\Attributes\Group;
+use Larafly\Apidoc\Models\LaraflyApidocType;
+use Larafly\Apidoc\Utils\RouteUtil;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\Finder\Finder;
 
-class GenerateCommand extends Command
+class ApidocCommand extends Command
 {
-    public $signature = 'apidoc:generate';
+    public $signature = 'apidoc';
 
     public $description = 'laravel api docs generator';
 
@@ -33,13 +35,13 @@ class GenerateCommand extends Command
             ->map(function ($route) {
                 $actionName = $route->getActionName();
                 if (! str_contains($actionName, '@')) {
-                    return null; // 非 controller 路由，跳过
+                    return null; // if not controller method route then break
                 }
                 [$controller, $method] = explode('@', $actionName);
-
+                $request_method = array_filter($route->methods(), fn($m) => in_array($m, ['GET', 'POST', 'PUT', 'DELETE']))[0]??'';
                 return [
                     'uri' => $route->uri(),
-                    'method' => implode('|', $route->methods()),
+                    'method' => $request_method,
                     'controller' => $controller,
                     'controller_method' => $method,
                 ];
@@ -51,15 +53,15 @@ class GenerateCommand extends Command
                 }
                 $reflection = new ReflectionClass($controller);
 
-                // 判断是否有 #[Group]
+                // if this class class contains #[Group]
                 $groupAttr = collect($reflection->getAttributes(Group::class))->first();
                 if (! $groupAttr) {
                     return null;
                 }
 
-                $groupName = $groupAttr->newInstance()->name;
-
-                $apis = [];
+                $groupName = $groupAttr->newInstance()->name??'';
+                $api_methods = [];
+                $alias = RouteUtil::getControllerAlias($controller);
 
                 foreach ($methods as $methodInfo) {
                     $methodName = $methodInfo['controller_method'];
@@ -72,7 +74,7 @@ class GenerateCommand extends Command
                     if ($apiAttr) {
                         $apiName = $apiAttr->newInstance()->name ?? '';
 
-                        $apis[] = [
+                        $api_methods[] = [
                             'uri' => $methodInfo['uri'],
                             'http_method' => $methodInfo['method'],
                             'method' => $methodName,
@@ -84,13 +86,22 @@ class GenerateCommand extends Command
                 }
 
                 return [
-                    'group' => $groupName,
+                    'name' => $groupName,
+                    'alias' => $alias,
                     'controller' => $controller,
-                    'apis' => $apis,
+                    'api_methods' => $api_methods,
                 ];
             })
             ->filter() // 去除没有 Group 的控制器
-            ->values();
+            ->values()->map(function ($api) {
+                $apidoc_type = LaraflyApidocType::firstOrNew(['alias' => $api['alias']]);
+                $apidoc_type->name = $api['name'];
+                dump();
+                if($apidoc_type->save()){
+
+                }
+                return $api;
+            });
         dump($controllerInfos);
     }
 

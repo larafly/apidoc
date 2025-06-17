@@ -3,7 +3,7 @@
 namespace Larafly\Apidoc;
 
 use Illuminate\Support\ServiceProvider;
-use Larafly\Apidoc\Commands\GenerateCommand;
+use Larafly\Apidoc\Commands\ApidocCommand;
 use Larafly\Apidoc\Commands\InstallCommand;
 
 class ApidocServiceProvider extends ServiceProvider
@@ -29,7 +29,7 @@ class ApidocServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                GenerateCommand::class,
+                ApidocCommand::class,
                 InstallCommand::class,
             ]);
         }
