@@ -1,0 +1,73 @@
+body{
+    margin: 0;
+    font-size: 14px;
+}
+[v-cloak] {
+    display: none;
+}
+.content {
+    margin:  0px auto;
+}
+.el-form--label-top .el-form-item__label{
+    font-size: 16px;
+    font-weight: bold;
+}
+.el-tree .filter-tree {
+    background-color: #fff;
+    font-size: 14px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none
+}
+
+.el-tree-node__content {
+    padding: 10px 16px;
+    border-left: 4px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.el-tree-node__content:hover {
+    background-color: #f5f7fa;
+}
+
+.el-tree-node.is-current > .el-tree-node__content {
+    background-color: #ecf5ff;
+    border-left-color: #409EFF;
+}
+.project-info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+.project-info a{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: #1a202c;
+}
+.el-dropdown-link{
+    display: flex;
+    align-items: center;
+}
+.custom-tree-node {
+    display: flex;
+    align-items: center;
+}
+.tree-parent{
+    font-weight: bold;
+}
+.custom-tree-node svg {
+    display: block;
+}
+.brand{
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 50px;
+    font-weight: bold;
+    background-image: linear-gradient(78deg, #EF3B2D 0%, #EF3B2D 45%, #6A82FB 100%);
+}
