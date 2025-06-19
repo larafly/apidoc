@@ -25,10 +25,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class LaraflyApidocType extends Model
 {
-    protected $fillable = ['name', 'alias'];
+    protected $fillable = ['name', 'alias','parent_id'];
 
-    public function laravel_api_doc(): HasMany
+    public function larafly_api_doc(): HasMany
     {
         return $this->hasMany(LaraflyApidoc::class);
+    }
+
+    public function children()
+    {
+        return $this->hasMany(self::class, 'parent_id');
     }
 }

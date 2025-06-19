@@ -33,6 +33,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class LaraflyApidoc extends Model
 {
+    protected $fillable = [
+        'larafly_api_doc_id',
+        'name',
+        'desc',
+        'request_type',
+        'url',
+        'request_data',
+        'response_data',
+    ];
     public function laravel_api_doc_type(): BelongsTo
     {
         return $this->belongsTo(LaraflyApidocType::class);

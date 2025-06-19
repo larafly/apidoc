@@ -29,8 +29,7 @@ class ApidocCommand extends Command
 
     public function getInfo()
     {
-        $routes = Route::getRoutes();
-        $controllerInfos = collect($routes)
+            collect(Route::getRoutes())
             ->filter(fn ($route) => isset($route->getAction()['controller']))
             ->map(function ($route) {
                 $actionName = $route->getActionName();
@@ -38,11 +37,11 @@ class ApidocCommand extends Command
                     return null; // if not controller method route then break
                 }
                 [$controller, $method] = explode('@', $actionName);
-                $request_method = array_filter($route->methods(), fn ($m) => in_array($m, ['GET', 'POST', 'PUT', 'DELETE']))[0] ?? '';
+                $request_type = array_filter($route->methods(), fn ($m) => in_array($m, ['GET', 'POST', 'PUT', 'DELETE']))[0] ?? '';
 
                 return [
-                    'uri' => $route->uri(),
-                    'method' => $request_method,
+                    'url' => url($route->uri()),
+                    'request_type' => $request_type,
                     'controller' => $controller,
                     'controller_method' => $method,
                 ];
@@ -73,15 +72,23 @@ class ApidocCommand extends Command
                     $method = $reflection->getMethod($methodName);
                     $apiAttr = collect($method->getAttributes(Api::class))->first();
                     if ($apiAttr) {
-                        $apiName = $apiAttr->newInstance()->name ?? '';
+                        $attr = $apiAttr->newInstance();
+                        $name = $attr->name;
+                        if($name){
+                            dump($attr);
+                            $api_methods[] = [
+                                'url' => $methodInfo['url'],
+                                'request_type' => $methodInfo['request_type'],
+                                'method' => $methodName,
+                                'desc' => $attr->desc,
+                                'request_data' => json_encode($methodInfo),
+                                'response_data' => json_encode($methodInfo),
+//                            'method2' => $method,
+                                'name' => $name,
+                            ];
+                        }
 
-                        $api_methods[] = [
-                            'uri' => $methodInfo['uri'],
-                            'http_method' => $methodInfo['method'],
-                            'method' => $methodName,
-                            'method2' => $method,
-                            'api_name' => $apiName,
-                        ];
+
                     }
 
                 }
@@ -95,127 +102,54 @@ class ApidocCommand extends Command
             })
             ->filter() // 去除没有 Group 的控制器
             ->values()->map(function ($api) {
-                $apidoc_type = LaraflyApidocType::firstOrNew(['alias' => $api['alias']]);
-                $apidoc_type->name = $api['name'];
-                dump();
+                $apidoc_type = $this->saveGroup($api['name'],$api['alias']);
                 if ($apidoc_type->save()) {
-
+                    foreach ($api['api_methods'] as $method) {
+                          $apidoc_type->larafly_api_doc()->updateOrCreate(
+                                ['url' => $method['url']], // Unique key
+                                [
+                                    'name' => $method['name'],
+                                    'desc' => $method['desc'],
+                                    'request_type' => $method['request_type'],
+                                    'request_data' => $method['request_data'],
+                                    'response_data' => $method['response_data'],
+                                ]
+                            );
+                    }
                 }
 
                 return $api;
             });
-        dump($controllerInfos);
     }
 
-    public function scan()
-    {
-        $finder = new Finder;
-        $controller_path = app_path('Http/Controllers');
-        $finder->files()->in($controller_path)->name('*.php');
+    private function saveGroup(string $group,string $alias):LaraflyApidocType{
+        $segments = explode('/', $group);
+        $parentId = 0;
+        $type = null;
 
-        foreach ($finder as $file) {
-            $class = $this->getFullClassNameFromFile($file->getRealPath());
-
-            if (! $class || ! class_exists($class)) {
-                continue;
-            }
-
-            $reflection = new ReflectionClass($class);
-
-            // 读取类上的 Group 属性
-            $groupAttributes = $reflection->getAttributes(Group::class);
-            if (empty($groupAttributes)) {
-                continue; // 不是你需要的 Controller
-            }
-
-            /** @var Group $groupInstance */
-            $groupInstance = $groupAttributes[0]->newInstance();
-            dump($groupInstance);
-            //            $categoryId = $this->createOrGetCategoryByPath($groupInstance->name);
-
-            // 遍历方法，读取 Api 属性
-            foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-                $apiAttributes = $method->getAttributes(Api::class);
-                if (empty($apiAttributes)) {
-                    continue;
-                }
-                /** @var Api $apiInstance */
-                $apiInstance = $apiAttributes[0]->newInstance();
-                dump($apiInstance);
-
-                //                $this->createOrUpdateApi($apiInstance->desc, $categoryId, $class, $method->getName());
-            }
-        }
-    }
-
-    // 根据文件路径推断完整类名（假设 PSR-4 标准）
-    protected function getFullClassNameFromFile(string $filePath): ?string
-    {
-        $content = file_get_contents($filePath);
-        if (preg_match('/namespace\s+([^;]+);/', $content, $m)) {
-            $namespace = $m[1];
-            if (preg_match('/class\s+(\w+)/', $content, $m2)) {
-                return $namespace.'\\'.$m2[1];
-            }
-        }
-
-        return null;
-    }
-
-    // 创建或获取分类，支持多级目录
-    protected function createOrGetCategoryByPath(string $path): int
-    {
-        $segments = explode('/', $path);
-        $parentId = 0; // 顶级分类父ID为0
-
-        $fullPath = '';
         foreach ($segments as $segment) {
-            $fullPath .= $segment.'/';
-
-            // 去除结尾 /
-            $searchPath = rtrim($fullPath, '/');
-
-            // 查询缓存或数据库是否已存在
-            if (isset($this->categoryCache[$searchPath])) {
-                $parentId = $this->categoryCache[$searchPath];
-
+            $segment = trim($segment);
+            if ($segment === '') {
                 continue;
             }
 
-            // 假设 Category 是你的模型，字段有：id, name, parent_id
-            $category = Category::where('name', $segment)->where('parent_id', $parentId)->first();
+            // Build unique alias path like: "parent", "parent_child", etc.
+            $fullAlias = $parentId===0 ? $alias : $alias . '_' . $segment;
 
-            if (! $category) {
-                $category = Category::create([
+            // Save or update node
+            $type = LaraflyApidocType::updateOrCreate(
+                ['alias' => $fullAlias],
+                [
                     'name' => $segment,
                     'parent_id' => $parentId,
-                ]);
-            }
+                ]
+            );
 
-            $parentId = $category->id;
-            $this->categoryCache[$searchPath] = $parentId;
+            // Set parent for next level
+            $parentId = $type->id;
         }
 
-        return $parentId; // 返回最后一级分类ID
+        return $type; // Return the deepest (last) level
     }
 
-    // 创建或更新接口信息
-    protected function createOrUpdateApi(string $description, int $categoryId, string $controller, string $method)
-    {
-        // 假设 ApiModel 是接口表模型，字段：id, category_id, controller, method, description
-        $api = ApiModel::firstOrCreate([
-            'category_id' => $categoryId,
-            'controller' => $controller,
-            'method' => $method,
-        ], [
-            'description' => $description,
-        ]);
-
-        // 你还可以做更新操作，比如 description 改变时更新
-        if ($api->description !== $description) {
-            $api->description = $description;
-            $api->save();
-
-        }
-    }
 }

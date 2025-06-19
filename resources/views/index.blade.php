@@ -34,7 +34,7 @@
                     style="margin: 15px 0;"></el-input>
             <el-tree
                 class="filter-tree"
-                :data="menuTree"
+                :data="tree"
                 :props="defaultProps"
                 default-expand-all
                 :filter-node-method="filterNode"
@@ -65,7 +65,7 @@
                             <h2>{{ tab.name }}</h2>
                             <p><strong>URL:</strong> {{ tab.url }}</p>
                             <p><strong>请求方式:</strong> {{ tab.request_type }}</p>
-                            <p><strong>Description:</strong> {{ tab.description }}</p>
+                            <p v-if="tab.desc"><strong>Description:</strong> {{ tab.desc }}</p>
 
                             <h3>Request Params</h3>
                             <pre>{{ tab.request_data | formatJson }}</pre>
@@ -176,93 +176,7 @@
                 app_name:'@lang('larafly-apidoc::apidoc.name')',
                 searchKeyword: '',
                 filterText: '',
-                menuTree: [{
-                    id: 1,
-                    name: '用户模块',
-                    children: [{
-                        id: 4,
-                        name: '认证控制器',
-                        children: [{
-                            id: 9,
-                            name: '登录',
-                            url: '/api/user/login',
-                            request_type: 'GET',
-                            description: '用户登录接口',
-                            request_data: { email: 'string', password: 'string' },
-                            response_data: { token: 'string' },
-                            demo: { token: 'abc123' }
-                        }, {
-                            id: 10,
-                            name: '登出',
-                            url: '/api/user/logout',
-                            request_type: 'POST',
-                            description: '用户登出接口',
-                            request_data: { token: 'string' },
-                            response_data: { success: 'boolean' },
-                            demo: { success: true }
-                        }]
-                    }]
-                }, {
-                    id: 2,
-                    name: '资料控制器',
-                    children: [{
-                        id: 5,
-                        name: '获取资料',
-                        url: '/api/user/profile',
-                        request_type: 'POST',
-                        description: '获取用户资料',
-                        request_data: { token: 'string' },
-                        response_data: { id: 'int', name: 'string', email: 'string' },
-                        demo: { id: 1, name: '张三', email: 'zhangsan@example.com' }
-                    }, {
-                        id: 6,
-                        name: '获取用户',
-                        url: '/api/user/profile',
-                        request_type: 'POST',
-                        description: '获取用户资料2',
-                        request_data: { token: 'string' },
-                        response_data: { id: 'int', name: 'string', email: 'string' },
-                        demo: { id: 1, name: '张三', email: 'zhangsan@example.com' }
-                    }]
-                }, {
-                    id: 3,
-                    name: '订单模块',
-                    children: [{
-                        id: 7,
-                        name: '订单控制器',
-                        children: [
-                            {
-                                id: 17,
-                                name: '创建订单',
-                                url: '/api/order/create',
-                                request_type: 'POST',
-                                description: '提交订单创建请求',
-                                request_data: { user_id: 'int', items: 'array' },
-                                response_data: { order_id: 'int' },
-                                demo: { order_id: 10086 }
-                            },
-                            {
-                                id: 18,
-                                name: '取消订单',
-                                url: '/api/order/cancel',
-                                request_type: 'POST',
-                                description: '根据订单 ID 取消订单',
-                                request_data: { order_id: 'int' },
-                                response_data: { cancelled: 'boolean' },
-                                demo: { cancelled: true }
-                            },
-                        ]
-                    }, {
-                        id: 8,
-                        name: '获取资料2',
-                        url: '/api/user/profile',
-                        request_type: 'POST',
-                        description: '获取用户资料2',
-                        request_data: { token: 'string' },
-                        response_data: { id: 'int', name: 'string', email: 'string' },
-                        demo: { id: 1, name: '张三', email: 'zhangsan@example.com' }
-                    }]
-                }],
+                tree:@json($tree),
                 defaultProps: {
                     children: 'children',
                     label: 'name'

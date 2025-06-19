@@ -6,7 +6,6 @@ namespace Larafly\Apidoc\Attributes;
 class Prop
 {
     /**
-     * @param  string  $name  column name
      * @param  string  $desc  column description
      * @param  string|int  $example  column demo
      * @param  string|array  $type  column type

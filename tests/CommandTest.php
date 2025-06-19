@@ -10,3 +10,8 @@ it('call apidoc', function () {
     expect($res)->toBe(0);
 
 });
+
+it('call apidoc install', function () {
+    $res = Artisan::call('apidoc:install');
+    expect($res)->toBe(0);
+});

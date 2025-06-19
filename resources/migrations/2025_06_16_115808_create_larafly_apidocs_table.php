@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('larafly_apidoc_types', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->comment('name');
+            $table->integer('parent_id')->comment('parent id')->default(0);
             $table->string('alias')->unique()->comment('alias');
             $table->timestamps();
         });
@@ -23,13 +24,14 @@ return new class extends Migration
             $table->increments('id');
             $table->unsignedInteger('larafly_apidoc_type_id')->comment('apidoc type id');
             $table->string('name')->comment('name');
+            $table->string('desc')->nullable()->comment('api description');
             $table->string('request_type')->comment('request type');
-            $table->string('url')->comment('url');
+            $table->string('url')->unique()->comment('url');
             $table->json('request_data')->comment('request data');
             $table->json('response_data')->comment('response data');
             $table->timestamps();
 
-            $table->foreign('larafly_apidoc_type_id')->references('id')->on('laravel_apidoc_types');
+            $table->foreign('larafly_apidoc_type_id')->references('id')->on('larafly_apidoc_types');
         });
     }
 
