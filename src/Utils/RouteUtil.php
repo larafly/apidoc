@@ -7,7 +7,6 @@ class RouteUtil
     /**
      * get controller unique alias
      *
-     * @param  $controllerClass
      * @return string alias
      */
     public static function getControllerAlias($controllerClass): string

@@ -9,8 +9,6 @@ use Larafly\Apidoc\Attributes\Group;
 use Larafly\Apidoc\Models\LaraflyApidocType;
 use Larafly\Apidoc\Utils\RouteUtil;
 use ReflectionClass;
-use ReflectionMethod;
-use Symfony\Component\Finder\Finder;
 
 class ApidocCommand extends Command
 {
@@ -29,7 +27,7 @@ class ApidocCommand extends Command
 
     public function getInfo()
     {
-            collect(Route::getRoutes())
+        collect(Route::getRoutes())
             ->filter(fn ($route) => isset($route->getAction()['controller']))
             ->map(function ($route) {
                 $actionName = $route->getActionName();
@@ -74,7 +72,7 @@ class ApidocCommand extends Command
                     if ($apiAttr) {
                         $attr = $apiAttr->newInstance();
                         $name = $attr->name;
-                        if($name){
+                        if ($name) {
                             dump($attr);
                             $api_methods[] = [
                                 'url' => $methodInfo['url'],
@@ -83,11 +81,10 @@ class ApidocCommand extends Command
                                 'desc' => $attr->desc,
                                 'request_data' => json_encode($methodInfo),
                                 'response_data' => json_encode($methodInfo),
-//                            'method2' => $method,
+                                //                            'method2' => $method,
                                 'name' => $name,
                             ];
                         }
-
 
                     }
 
@@ -102,19 +99,19 @@ class ApidocCommand extends Command
             })
             ->filter() // 去除没有 Group 的控制器
             ->values()->map(function ($api) {
-                $apidoc_type = $this->saveGroup($api['name'],$api['alias']);
+                $apidoc_type = $this->saveGroup($api['name'], $api['alias']);
                 if ($apidoc_type->save()) {
                     foreach ($api['api_methods'] as $method) {
-                          $apidoc_type->larafly_api_doc()->updateOrCreate(
-                                ['url' => $method['url']], // Unique key
-                                [
-                                    'name' => $method['name'],
-                                    'desc' => $method['desc'],
-                                    'request_type' => $method['request_type'],
-                                    'request_data' => $method['request_data'],
-                                    'response_data' => $method['response_data'],
-                                ]
-                            );
+                        $apidoc_type->larafly_api_doc()->updateOrCreate(
+                            ['url' => $method['url']], // Unique key
+                            [
+                                'name' => $method['name'],
+                                'desc' => $method['desc'],
+                                'request_type' => $method['request_type'],
+                                'request_data' => $method['request_data'],
+                                'response_data' => $method['response_data'],
+                            ]
+                        );
                     }
                 }
 
@@ -122,7 +119,8 @@ class ApidocCommand extends Command
             });
     }
 
-    private function saveGroup(string $group,string $alias):LaraflyApidocType{
+    private function saveGroup(string $group, string $alias): LaraflyApidocType
+    {
         $segments = explode('/', $group);
         $parentId = 0;
         $type = null;
@@ -134,7 +132,7 @@ class ApidocCommand extends Command
             }
 
             // Build unique alias path like: "parent", "parent_child", etc.
-            $fullAlias = $parentId===0 ? $alias : $alias . '_' . $segment;
+            $fullAlias = $parentId === 0 ? $alias : $alias.'_'.$segment;
 
             // Save or update node
             $type = LaraflyApidocType::updateOrCreate(
@@ -151,5 +149,4 @@ class ApidocCommand extends Command
 
         return $type; // Return the deepest (last) level
     }
-
 }

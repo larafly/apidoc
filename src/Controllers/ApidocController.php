@@ -10,10 +10,10 @@ class ApidocController
     {
         $tree = $this->buildApidocTree();
 
-        return view('larafly-apidoc::index',compact('tree'));
+        return view('larafly-apidoc::index', compact('tree'));
     }
 
-    function buildApidocTree($parentId = 0): array
+    public function buildApidocTree($parentId = 0): array
     {
         $types = LaraflyApidocType::where('parent_id', $parentId)->get();
 

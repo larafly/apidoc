@@ -42,6 +42,7 @@ class LaraflyApidoc extends Model
         'request_data',
         'response_data',
     ];
+
     public function laravel_api_doc_type(): BelongsTo
     {
         return $this->belongsTo(LaraflyApidocType::class);
