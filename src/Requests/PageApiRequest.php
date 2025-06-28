@@ -4,12 +4,12 @@ namespace Larafly\Apidoc\Requests;
 
 use Larafly\Apidoc\Attributes\Prop;
 
-class PageRequest extends Request
+class PageApiRequest extends ApiRequest
 {
-    #[Prop(desc: '页码,最小为1', example: 1)]
+    #[Prop(desc: '页码,最小为1')]
     public ?int $page = 1;
 
-    #[Prop(desc: '每页条数,最小为10，最大为100', example: 10)]
+    #[Prop(desc: '每页条数,最小为10，最大为100')]
     public ?int $per_page = 10;
 
     public function rules(): array

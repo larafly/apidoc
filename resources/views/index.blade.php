@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{config('larafly-apidoc.name','Larafly Apidoc')}}</title>
+    <title>{{config('larafly-apidoc.app_name','Larafly Apidoc')}}</title>
     <link rel="icon" type="image/png" href="/larafly-apidoc/assets/images/logo.png">
     <!-- Styles -->
     <link href="/larafly-apidoc/assets/css/element.css" rel="stylesheet" type="text/css">
@@ -22,13 +22,14 @@
             <!-- Logo -->
             <div style="display: flex; align-items: center; justify-content: center;">
                 <img src="/larafly-apidoc/assets/images/logo.png" style="width: 40px; margin-right: 10px;" />
-                <p style="font-size: 24px; margin: 0px;color: #FF2D20;">{{app_name}}</p>
+                <p style="font-size: 24px; margin: 0px;color: #FF2D20;">{{lang.app_name}}</p>
             </div>
                 <!-- 搜索框 -->
                 <el-input
                     ref="searchInput"
-                    v-model="filterText"
-                    placeholder="Type / to search"
+                    v-model="searchKeyword"
+                    :placeholder="lang.search_placeholder"
+                    @input="onSearch"
                     clearable
                     prefix-icon="el-icon-search"
                     style="margin: 15px 0;"></el-input>
@@ -46,36 +47,121 @@
 
        <!-- 中间内容区域 -->
         <el-container>
-            <el-main style="padding: 0 10px;">
+            <el-main style="padding: 0 10px; display: flex; flex-direction: column; height: 100%;">
                 <div v-if="openTabs.length === 0" style="height: 90%; display: flex; align-items: center; justify-content: center;">
                     <div style="display: flex; align-items: center;">
                         <img src="/larafly-apidoc/assets/images/logo.png" style="width: 90px; margin-right: 10px;" />
-                        <p class="brand" >{{ app_name }}</p>
+                        <p class="brand" >{{ lang.app_name }}</p>
                     </div>
                 </div>
                 <div v-else>
-                <el-tabs v-model="activeTab" type="card" closable @tab-remove="handleTabRemove">
+                <el-tabs v-model="activeTab" type="card" closable @tab-remove="handleTabRemove" style="flex-shrink: 0;">
                     <el-tab-pane
                         v-for="tab in openTabs"
                         :key="tab.id"
                         :label="tab.name"
                         :name="tab.id"
                     >
-                        <div style="padding: 15px;">
+                        <div style="overflow-y: auto; max-height: calc(100vh - 100px); padding: 15px;">
                             <h2>{{ tab.name }}</h2>
-                            <p><strong>URL:</strong> {{ tab.url }}</p>
-                            <p><strong>请求方式:</strong> {{ tab.request_type }}</p>
-                            <p v-if="tab.desc"><strong>Description:</strong> {{ tab.desc }}</p>
+                            <p class="desc" v-if="tab.desc">{{ tab.desc }}</p>
+                            <h3>
+                                <el-tag :type="tab.request_type==='GET'?'success':'danger'">
+                                    {{ tab.request_type }}
+                                </el-tag>
+                                <span class="ml5">{{ tab.url }}</span>
+                            </h3>
+                            <div class="meta-row">
+                                <span class="label">{{ lang.creator }}</span>
+                                <span class="value">{{ tab.creator }}</span>
+                                <span class="label" v-if="tab.creator!=tab.updater">{{ lang.updater }}</span>
+                                <span class="value" v-if="tab.creator!=tab.updater">{{ tab.updater }}</span>
+                                <span class="label">{{ lang.update_time }}</span>
+                                <span class="value">{{ tab.updated_at }}</span>
+                            </div>
 
-                            <h3>Request Params</h3>
-                            <pre>{{ tab.request_data | formatJson }}</pre>
+                            <h3>{{ lang.request_param }}</h3>
 
-                            <h3>Response Params</h3>
-                            <pre>{{ tab.response_data | formatJson }}</pre>
+                            <el-table
+                                :data="tab.request_data"
+                                border
+                                row-key="name"
+                                default-expand-all
+                                :empty-text="lang.no_data"
+                                :header-cell-style="{
+                                backgroundColor: '#0088CC',
+                                color: '#ffffff',
+                                fontWeight: 'bold'
+                              }"
+                                style="width: 100%">
+                                <el-table-column :label="lang.name" width="200">
+                                    <template slot-scope="scope">
+                                        <span  @click="copyText(scope.row.name)" style="color: #3a8ee6;cursor: pointer">
+                                            {{ scope.row.name }}
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                    prop="type"
+                                    width="150"
+                                    :label="lang.type">
+                                    <template slot-scope="scope">
+                                        <span :style="{ color: scope.row.type === 'array' || scope.row.type === 'object' ? '#E6A23C' : '#000' }">
+                                          {{ scope.row.type }}
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                    prop="required"
+                                    width="100"
+                                    :label="lang.is_required">
+                                    <template slot-scope="scope">
+                                        <span style="color: red" v-if="scope.row.is_required">{{ lang.yes }}</span>
+                                        <span v-else>{{ lang.no }}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                    prop="desc"
+                                    :label="lang.desc">
+                                </el-table-column>
+                            </el-table>
+                            <h3>{{ lang.response_param }}</h3>
+                            <el-table
+                                :data="tab.response_data"
+                                border
+                                row-key="name"
+                                default-expand-all
+                                :header-cell-style="{
+                                backgroundColor: '#0088CC',
+                                color: '#ffffff',
+                                fontWeight: 'bold'
+                              }"
+                                style="width: 100%">
+                                <el-table-column :label="lang.name">
+                                    <template slot-scope="scope">
+                                        <span  @click="copyText(scope.row.name)" style="color: #3a8ee6;cursor: pointer">
+                                            {{ scope.row.name }}
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                    prop="type"
+                                    :label="lang.type">
+                                    <template slot-scope="scope">
+                                        <span :style="{ color: scope.row.type === 'array' || scope.row.type === 'object' ? '#E6A23C' : '#000' }">
+                                          {{ scope.row.type }}
+                                        </span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column
+                                    prop="desc"
+                                    :label="lang.desc">
+                                </el-table-column>
+                            </el-table>
 
-                            <h3>Demo Response</h3>
-                            <el-card>
-                                <pre>{{ tab.demo | formatJson }}</pre>
+                            <h3>{{ lang.response_demo }}</h3>
+                            <el-card class="json-card">
+                                <pre v-html="highlightJson(tab.response_demo)"></pre>
                             </el-card>
                         </div>
                     </el-tab-pane>
@@ -101,7 +187,7 @@
           </span>
                     <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item v-for="item in language_options" :command="item.value" :key="item.value">
-                            {{ item.label }}
+                            <a :href="item.url">{{ item.label }}</a>
                         </el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
@@ -115,22 +201,11 @@
 <!-- Scripts -->
 <script src="/larafly-apidoc/assets/js/vue.js"></script>
 <script src="/larafly-apidoc/assets/js/axios.js"></script>
-<script src="/larafly-apidoc/assets/js/element-2.4.js"></script>
+<script src="/larafly-apidoc/assets/js/element-2.15.js"></script>
 <script>
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    String.prototype.trim = function (char, type) {
-        if (char) {
-            if (type == 'left') {
-                return this.replace(new RegExp('^\\'+char+'+', 'g'), '');
-            } else if (type == 'right') {
-                return this.replace(new RegExp('\\'+char+'+$', 'g'), '');
-            }
-            return this.replace(new RegExp('^\\'+char+'+|\\'+char+'+$', 'g'), '');
-        }
-        return this.replace(/^\s+|\s+$/g, '');
-    };
     /**
-     * get请求
+     * get request
      * @param url
      * @param params
      * @returns {Promise<any>}
@@ -150,7 +225,7 @@
         });
     }
     /**
-     * post请求
+     * post request
      * @param url
      * @param params
      * @returns {Promise<any>}
@@ -169,13 +244,29 @@
     }
 </script>
 <script>
-    var vm = new Vue({
+    const vm = new Vue({
         el: '#app',
         data: function () {
             return {
-                app_name:'@lang('larafly-apidoc::apidoc.name')',
+                lang:{
+                    app_name:'@lang('larafly-apidoc::apidoc.app_name')',
+                    search_placeholder:'@lang('larafly-apidoc::apidoc.search_placeholder')',
+                    request_type:'@lang('larafly-apidoc::apidoc.request_type')',
+                    creator:'@lang('larafly-apidoc::apidoc.creator')',
+                    updater:'@lang('larafly-apidoc::apidoc.updater')',
+                    update_time:'@lang('larafly-apidoc::apidoc.update_time')',
+                    request_param:'@lang('larafly-apidoc::apidoc.request_param')',
+                    response_param:'@lang('larafly-apidoc::apidoc.response_param')',
+                    name:'@lang('larafly-apidoc::apidoc.name')',
+                    type:'@lang('larafly-apidoc::apidoc.type')',
+                    is_required:'@lang('larafly-apidoc::apidoc.is_required')',
+                    desc:'@lang('larafly-apidoc::apidoc.desc')',
+                    yes:'@lang('larafly-apidoc::apidoc.yes')',
+                    no:'@lang('larafly-apidoc::apidoc.no')',
+                    no_data:'@lang('larafly-apidoc::apidoc.no_data')',
+                    response_demo:'@lang('larafly-apidoc::apidoc.response_demo')',
+                },
                 searchKeyword: '',
-                filterText: '',
                 tree:@json($tree),
                 defaultProps: {
                     children: 'children',
@@ -184,23 +275,27 @@
                 openTabs: [],
                 activeTab: '',
                 language_options: [
-                    {label: 'English', value: 'en'},
-                    {label: '简体中文', value: 'zh'}
-                ]
-            }
-        },
-        computed: {
-
-        },
-        watch: {
-            filterText(val) {
-                this.$refs.treeRef.filter(val);
+                    {label: 'English', value: 'en',url:'{{ route('larafly-apidoc.index',['locale'=>'en']) }}'},
+                    {label: '简体中文', value: 'zh_CN',url:'{{ route('larafly-apidoc.index',['locale'=>'zh_CN']) }}'}
+                ],
             }
         },
         methods: {
+            copyText(text) {
+                let copyContent = document.createElement('input')
+                copyContent.value = text
+                document.body.appendChild(copyContent)
+                copyContent.select()
+                document.execCommand('copy')
+                document.body.removeChild(copyContent);
+                vm.$message.success('@lang('larafly-apidoc::apidoc.copy_success')');
+            },
             filterNode(value, data) {
                 if (!value) return true;
-                return data.label.indexOf(value) !== -1;
+                return data.name && data.name.toLowerCase().includes(value.toLowerCase());
+            },
+            onSearch(val) {
+                this.$refs.treeRef.filter(val);
             },
             handleTreeClick(item) {
                 if(!item.children){
@@ -219,6 +314,7 @@
             },
             renderContent(h, { node, data }) {
                 const isParent = data.children && data.children.length > 0;
+                const highlight = text => this.highlightText(h, text, this.searchKeyword);
                 if(isParent){
                     return h('span', { class: 'custom-tree-node tree-parent' }, [
                         h('svg', { attrs: { viewBox: '0 0 16 16', width: 16, height: 16 }, domProps: {
@@ -226,22 +322,31 @@
         <path opacity="0.01" fill="#C4C4C4" d="M0 0h16v16H0z"></path> <path d="M6.006 1c.367 0 .55 0 .723.041.153.037.3.098.433.18.152.093.282.223.54.482l.595.594c.26.26.39.39.54.482a1.5 1.5 0 0 0 .434.18C9.444 3 9.627 3 9.994 3H13.6c.84 0 1.26 0 1.581.163a1.5 1.5 0 0 1 .655.656c.164.32.164.74.164 1.581v7.2c0 .84 0 1.26-.164 1.581a1.5 1.5 0 0 1-.655.655c-.32.164-.74.164-1.581.164H2.4c-.84 0-1.26 0-1.581-.164a1.5 1.5 0 0 1-.656-.655C0 13.861 0 13.441 0 12.6V3.4c0-.84 0-1.26.163-1.581a1.5 1.5 0 0 1 .656-.656C1.139 1 1.559 1 2.4 1h3.606Z" fill="#0980FF"></path>
       `
                             }, style: { marginRight: '6px' } }),
-                        h('span', data.name),
+                        highlight(data.name)
                     ]);
                 }
                 const request_type = data.request_type;
                 const type = request_type==='GET'?'success':'danger'
                 return h('span', { class: 'custom-tree-node' }, [
                     h('i', { class: 'el-icon-document', style: { marginRight: '6px' } }),
-                    h('span', data.name),
+                    highlight(data.name),
                     h('el-tag', {attrs: { size: "mini",type: type},style: { marginLeft: '6px' }},request_type),
                 ]);
             },
-            highlightMatch(text) {
-                const keyword = this.searchKeyword.trim()
-                if (!keyword) return text
-                const reg = new RegExp(`(${keyword})`, 'gi')
-                return text.replace(reg, '<span style="color:red;">$1</span>')
+            highlightText(h, text, keyword) {
+                if (!keyword) return h('span', text);
+                const index = text.toLowerCase().indexOf(keyword.toLowerCase());
+                if (index === -1) return h('span', text);
+
+                const before = text.slice(0, index);
+                const match = text.slice(index, index + keyword.length);
+                const after = text.slice(index + keyword.length);
+
+                return h('span', [
+                    before,
+                    h('span', { style: { color: '#f56c6c', fontWeight: 'bold' } }, match),
+                    after,
+                ]);
             },
             handleGlobalKey(e) {
                 if (e.key === '/' && !e.metaKey && !e.ctrlKey) {
@@ -256,6 +361,28 @@
                         inputEl.focus();
                     });
                 }
+            },
+            highlightJson(json) {
+                if (!json) return ''
+                if (typeof json !== 'string') {
+                    json = JSON.stringify(json, null, 2)
+                }
+                json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                return json.replace(/("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                    let cls = 'number'
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'key'
+                        } else {
+                            cls = 'string'
+                        }
+                    } else if (/true|false/.test(match)) {
+                        cls = 'boolean'
+                    } else if (/null/.test(match)) {
+                        cls = 'null'
+                    }
+                    return '<span class="json-' + cls + '">' + match + '</span>'
+                })
             }
         },
         filters: {

@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use ReflectionNamedType;
 use ReflectionProperty;
 
-abstract class Request extends FormRequest
+abstract class ApiRequest extends FormRequest
 {
     protected function passedValidation(): void
     {

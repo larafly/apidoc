@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Larafly\Apidoc\Responses;
 
-use App\Http\Responses\ApiResponse;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 

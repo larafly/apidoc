@@ -27,7 +27,7 @@ class LaraflyApidocType extends Model
 {
     protected $fillable = ['name', 'alias', 'parent_id'];
 
-    public function larafly_api_doc(): HasMany
+    public function larafly_apidocs(): HasMany
     {
         return $this->hasMany(LaraflyApidoc::class);
     }

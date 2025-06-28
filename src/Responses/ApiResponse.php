@@ -36,7 +36,7 @@ class ApiResponse implements Responsable
 
     public static function success(mixed $data): static
     {
-        return new static($data);
+        return new static(data: $data);
     }
 
     public function getData(): mixed
@@ -92,6 +92,8 @@ class ApiResponse implements Responsable
                         // get current type collection reflect models
                         $args[$name] = $model->$name->map(fn (Model $item) => $type::fromModel($item));
                     }
+                }elseif (is_array($type)){
+                    $args[$name] = $type;
                 }
             } else {
                 $args[$name] = $model->$name;

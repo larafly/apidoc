@@ -7,8 +7,7 @@ class Prop
 {
     /**
      * @param  string  $desc  column description
-     * @param  string|int  $example  column demo
      * @param  string|array  $type  column type
      */
-    public function __construct(public string $desc = '', public string|int $example = '', public string|array $type = '') {}
+    public function __construct(public string $desc = '', public string|array $type = '') {}
 }
