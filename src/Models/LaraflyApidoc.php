@@ -51,9 +51,9 @@ class LaraflyApidoc extends Model
     ];
 
     protected $casts = [
-      'request_data' => 'json',
-      'response_data' => 'json',
-      'response_demo' => 'json',
+        'request_data' => 'json',
+        'response_data' => 'json',
+        'response_demo' => 'json',
     ];
 
     protected function serializeDate(DateTimeInterface $date): string

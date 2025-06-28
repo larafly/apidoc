@@ -1,4 +1,5 @@
 <?php
+
 namespace Larafly\Apidoc\Tests;
 
 use App\Enums\UserTypeEnum;
@@ -7,7 +8,7 @@ use Larafly\Apidoc\Requests\ApiRequest;
 
 class UserRequest extends ApiRequest
 {
-    #[Prop(desc: 'id',)]
+    #[Prop(desc: 'id', )]
     public int $id;
 
     #[Prop(desc: '名称')]
@@ -15,5 +16,4 @@ class UserRequest extends ApiRequest
 
     #[Prop(desc: '用户类型')]
     public UserTypeEnum $user_type;
-
 }

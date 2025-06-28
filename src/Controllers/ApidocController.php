@@ -20,7 +20,7 @@ class ApidocController
         }
         App::setLocale($locale);
         $tree = $this->buildApidocTree();
-//        dump($tree);
+        //        dump($tree);
 
         return view('larafly-apidoc::index', compact('tree'));
     }

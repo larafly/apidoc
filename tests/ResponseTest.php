@@ -1,9 +1,6 @@
 <?php
 
-use Larafly\Apidoc\Tests\UserApiRequest;
-use Larafly\Apidoc\Tests\UserLogWithUserResponse;
 use Larafly\Apidoc\Tests\UserResponse;
-use Larafly\Apidoc\Utils\ReflectionUtil;
 
 it('get demo', function () {
     $demoArray = [];
@@ -24,5 +21,3 @@ it('get demo', function () {
     }
     expect($demoArray)->toBeArray();
 });
-
-

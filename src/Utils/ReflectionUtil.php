@@ -5,7 +5,6 @@ namespace Larafly\Apidoc\Utils;
 use Larafly\Apidoc\Attributes\Prop;
 use Larafly\Apidoc\Requests\ApiRequest;
 use Larafly\Apidoc\Responses\ApiResponse;
-use Larafly\Apidoc\Responses\PaginateResponse;
 use ReflectionClass;
 use ReflectionEnum;
 use ReflectionException;
@@ -15,8 +14,9 @@ class ReflectionUtil
 {
     /**
      * get request params
-     * @param string $request_class name
-     * @return array
+     *
+     * @param  string  $request_class  name
+     *
      * @throws ReflectionException
      */
     public static function request(string $request_class): array
@@ -68,11 +68,11 @@ class ReflectionUtil
         return array_values($request_data);
     }
 
-
     /**
      * get response params
-     * @param string $response_class name
-     * @return array
+     *
+     * @param  string  $response_class  name
+     *
      * @throws ReflectionException
      */
     public static function response(string $response_class): array
@@ -96,7 +96,7 @@ class ReflectionUtil
                             $backingType = $enumReflection->getBackingType();
                             $backingTypeName = $backingType?->getName();
                             $response_data[$k]['type'] = $backingTypeName;
-                        }elseif (is_subclass_of($type, ApiResponse::class)){
+                        } elseif (is_subclass_of($type, ApiResponse::class)) {
                             $response_data[$k]['children'] = static::response($type);
                             $response_data[$k]['type'] = 'object';
                         } else {
@@ -113,7 +113,7 @@ class ReflectionUtil
                             if (is_string($prop_type)) {
                                 $response_data[$k]['children'] = static::response($prop_type);
                             } elseif (is_array($prop_type)) {
-                                $response_data[$k]['children'] = self::normalizeProps($prop_type,false);
+                                $response_data[$k]['children'] = self::normalizeProps($prop_type, false);
                             }
                         }
 
@@ -128,11 +128,11 @@ class ReflectionUtil
 
     /**
      * Handle user-defined props
-     * @param array $rows need to handle data
-     * @param bool $need_require is need add require row
-     * @return array
+     *
+     * @param  array  $rows  need to handle data
+     * @param  bool  $need_require  is need add require row
      */
-    public static function normalizeProps(array $rows, bool $need_require=true): array
+    public static function normalizeProps(array $rows, bool $need_require = true): array
     {
 
         return array_values(array_filter(array_map(function ($row) use ($need_require) {
@@ -174,12 +174,13 @@ class ReflectionUtil
 
     /**
      * generate response demo
-     * @param string $response_class if exist method getDemo,will return the demo
-     * @param array $response_data give defined response data
-     * @return array
+     *
+     * @param  string  $response_class  if exist method getDemo,will return the demo
+     * @param  array  $response_data  give defined response data
+     *
      * @throws ReflectionException
      */
-    public static function responseDemo(string $response_class,array $response_data): array
+    public static function responseDemo(string $response_class, array $response_data): array
     {
         $result = [];
         if (is_subclass_of($response_class, ApiResponse::class)) {
@@ -207,7 +208,7 @@ class ReflectionUtil
         $name = strtolower($field['name']);
 
         // Handle nested structures
-        if (!empty($field['children']) && is_array($field['children'])) {
+        if (! empty($field['children']) && is_array($field['children'])) {
             if ($type === 'array') {
                 return [
                     self::generateChildrenObject($field['children']),
@@ -224,7 +225,7 @@ class ReflectionUtil
             'float', 'double' => 1.23,
             'bool', 'boolean' => true,
             'string' => self::getSampleString($name),
-             default => null,
+            default => null,
         };
     }
 
@@ -234,8 +235,10 @@ class ReflectionUtil
         foreach ($children as $child) {
             $obj[$child['name']] = self::generateSampleValue($child);
         }
+
         return $obj;
     }
+
     private static function getSampleInt(string $name): int
     {
         return match (true) {
@@ -247,6 +250,7 @@ class ReflectionUtil
             default => 1,
         };
     }
+
     private static function getSampleString(string $name): string
     {
         return match (true) {
@@ -257,7 +261,7 @@ class ReflectionUtil
             str_contains($name, 'last_page') => 10,
             str_contains($name, 'per_page') => 10,
             str_contains($name, 'total') => 100,
-            str_contains($name, 'created') || str_contains($name, 'updated') => date(config('larafly-apidoc.datetime_format'),strtotime('2025-06-28 10:00:00')),
+            str_contains($name, 'created') || str_contains($name, 'updated') => date(config('larafly-apidoc.datetime_format'), strtotime('2025-06-28 10:00:00')),
             default => 'success',
         };
     }

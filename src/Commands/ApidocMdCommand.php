@@ -20,7 +20,6 @@ class ApidocMdCommand extends ApidocCommand
      */
     public $description = 'generator api documents to markdown files';
 
-
     public function saveControllerDoc(array $api): void
     {
         $groupName = $api['name'];
@@ -28,7 +27,7 @@ class ApidocMdCommand extends ApidocCommand
 
         foreach ($api['api_methods'] as $method) {
             $markdown = $this->buildMarkdownDoc($method);
-            $fileName = $method['name'] . '.md';
+            $fileName = $method['name'].'.md';
             Storage::disk('public')->put("$folder/{$fileName}", $markdown);
         }
     }
@@ -38,23 +37,23 @@ class ApidocMdCommand extends ApidocCommand
         $lines = [];
 
         // Title
-        $lines[] = '# ' . $method['name'];
+        $lines[] = '# '.$method['name'];
         $lines[] = '';
-        if($method['desc']){
-            $lines[] = '* ' . $method['desc'];
+        if ($method['desc']) {
+            $lines[] = '* '.$method['desc'];
         }
         $lines[] = '';
 
         // URL
         $lines[] = '### '.trans('larafly-apidoc::apidoc.request_url');
         $lines[] = '';
-        $lines[] = '* '. $method['url'];
+        $lines[] = '* '.$method['url'];
         $lines[] = '';
 
         // Method
         $lines[] = '### '.trans('larafly-apidoc::apidoc.request_type');
         $lines[] = '';
-        $lines[] = '* ' . $method['request_type'];
+        $lines[] = '* '.$method['request_type'];
         $lines[] = '';
 
         // Request Params
@@ -67,7 +66,7 @@ class ApidocMdCommand extends ApidocCommand
             $lines[] = sprintf(
                 '| %s | %s | %s | %s |',
                 $item['name'] ?? '',
-                !empty($item['is_required']) ? 'Y' : 'N',
+                ! empty($item['is_required']) ? 'Y' : 'N',
                 $item['type'] ?? '',
                 $item['desc'] ?? ''
             );
@@ -101,5 +100,4 @@ class ApidocMdCommand extends ApidocCommand
 
         return implode("\n", $lines);
     }
-
 }

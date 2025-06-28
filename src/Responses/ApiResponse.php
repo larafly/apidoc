@@ -92,7 +92,7 @@ class ApiResponse implements Responsable
                         // get current type collection reflect models
                         $args[$name] = $model->$name->map(fn (Model $item) => $type::fromModel($item));
                     }
-                }elseif (is_array($type)){
+                } elseif (is_array($type)) {
                     $args[$name] = $type;
                 }
             } else {

@@ -23,4 +23,3 @@ it('response with object', function () {
     dump($res);
     expect($res)->toBeArray();
 });
-

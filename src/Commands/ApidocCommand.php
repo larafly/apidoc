@@ -198,21 +198,22 @@ class ApidocCommand extends Command
 
     public function cleanUnusedApidocTypes(): void
     {
-//        LaraflyApidocType::withCount('larafly_apidocs')
-//            ->get()
-//            ->filter(fn ($type) => $type->larafly_apidocs_count === 0)
-//            ->each(fn ($type) => $type->delete());
+        //        LaraflyApidocType::withCount('larafly_apidocs')
+        //            ->get()
+        //            ->filter(fn ($type) => $type->larafly_apidocs_count === 0)
+        //            ->each(fn ($type) => $type->delete());
         LaraflyApidocType::withCount('larafly_apidocs')
             ->get()
             ->filter(function ($type) {
                 // Check if this type has no apidocs AND no children types
                 $hasNoDocs = $type->larafly_apidocs_count === 0;
-                $hasNoChildren = !LaraflyApidocType::where('parent_id', $type->id)->exists();
+                $hasNoChildren = ! LaraflyApidocType::where('parent_id', $type->id)->exists();
 
                 return $hasNoDocs && $hasNoChildren;
             })
             ->each(fn ($type) => $type->delete());
     }
+
     /**
      * get response data by return class
      *
