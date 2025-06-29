@@ -37,6 +37,7 @@
                 class="filter-tree"
                 :data="tree"
                 :props="defaultProps"
+                :empty-text="lang.no_data"
                 default-expand-all
                 :filter-node-method="filterNode"
                 @node-click="handleTreeClick"
@@ -129,6 +130,7 @@
                             <el-table
                                 :data="tab.response_data"
                                 border
+                                :empty-text="lang.no_data"
                                 row-key="name"
                                 default-expand-all
                                 :header-cell-style="{
