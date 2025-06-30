@@ -2,7 +2,7 @@
     "name": "larafly/apidoc",
     "description": "this is for laravel api document ",
     "keywords": [
-        "larafly/apidoc",
+        "larafly-apidoc",
         "laravel",
         "apidoc"
     ],
