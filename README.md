@@ -1,84 +1,57 @@
-# this is for laravel api document 
+<p align="center">
+<a href="https://apidoc.pp-lang.tech"><img src="https://apidoc.pp-lang.tech/logo.png" width="400" alt="Laravel Apidoc"></a>
+</p>
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/larafly-apidoc/larafly-apidoc.svg?style=flat-square)](https://packagist.org/packages/larafly-apidoc/larafly-apidoc)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/larafly-apidoc/larafly-apidoc/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/larafly-apidoc/larafly-apidoc/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/larafly-apidoc/larafly-apidoc/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/larafly-apidoc/larafly-apidoc/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/larafly-apidoc/larafly-apidoc.svg?style=flat-square)](https://packagist.org/packages/larafly-apidoc/larafly-apidoc)
+# Laravel Apidoc
+## [中文文档](readme_zh_CN.md)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/larafly/apidoc.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/larafly/apidoc)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+Laravel Apidoc is an API documentation generation tool based on [Laravel](https://laravel.com/).
 
 ## Installation
 
-You can install the package via composer:
+Install via Composer:
 
 ```bash
 composer require larafly/apidoc
 ```
 
-You can publish and run the migrations with:
+Run the following command to install the documentation tool:
 
-```bash
-php artisan vendor:publish --tag="larafly-apidoc"
-php artisan migrate
+```sh
+php artisan apidoc:install
 ```
 
-You can publish the config file with:
+Now you can access `Laravel Apidoc` at `http://localhost:8000/apidoc` in your application.
 
-```bash
-php artisan vendor:publish --tag="larafly-apidoc-config"
+## Configuration File
+
+Publish the configuration file:
+
+```sh
+php artisan vendor:publish --tag=larafly-apidoc
 ```
 
-This is the contents of the published config file:
+Explanation of the `larafly-apidoc.php` file:
 
 ```php
+<?php
+
 return [
+    // API documentation access route
+    'route' => env('API_DOC_ROUTE', 'apidoc'),
+    // Date format
+    'datetime_format' => 'Y-m-d H:i:s',
+    // Author of the API documentation
+    'author' => env('GENERATOR_AUTHOR', 'system'),
+    // Show documentation in production, default is false
+    'is_show' => env('API_DOC_SHOW', false),
 ];
 ```
 
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="larafly-apidoc-views"
-```
-
-## Usage
-
-```php
-$larafly/ApiDoc = new Larafly/Apidoc\Larafly/ApiDoc();
-echo $larafly/ApiDoc->echoPhrase('Hello, Larafly/Apidoc!');
-```
-
-## Testing
-
-```bash
-composer test
-```
+Set `GENERATOR_AUTHOR=Your Name` in your `.env` file to configure the author.
 
 ## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+View the [changelog](changelog.md) for update history.
 
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
-
-- [foryoufeng](https://github.com/foryoufeng)
-- [All Contributors](../../contributors)
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+MIT. Please see the [license file](license.md) for more information.

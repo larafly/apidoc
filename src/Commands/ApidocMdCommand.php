@@ -20,6 +20,7 @@ class ApidocMdCommand extends ApidocCommand
      */
     public $description = 'generator api documents to markdown files';
 
+    #[\Override]
     public function saveControllerDoc(array $api): void
     {
         $groupName = $api['name'];

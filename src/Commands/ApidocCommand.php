@@ -198,10 +198,6 @@ class ApidocCommand extends Command
 
     public function cleanUnusedApidocTypes(): void
     {
-        //        LaraflyApidocType::withCount('larafly_apidocs')
-        //            ->get()
-        //            ->filter(fn ($type) => $type->larafly_apidocs_count === 0)
-        //            ->each(fn ($type) => $type->delete());
         LaraflyApidocType::withCount('larafly_apidocs')
             ->get()
             ->filter(function ($type) {
