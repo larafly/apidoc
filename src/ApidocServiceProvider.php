@@ -5,6 +5,8 @@ namespace Larafly\Apidoc;
 use Illuminate\Support\ServiceProvider;
 use Larafly\Apidoc\Commands\ApidocCommand;
 use Larafly\Apidoc\Commands\ApidocMdCommand;
+use Larafly\Apidoc\Commands\ApiDocRequestCommand;
+use Larafly\Apidoc\Commands\ApiDocResponseCommand;
 use Larafly\Apidoc\Commands\InstallCommand;
 
 class ApidocServiceProvider extends ServiceProvider
@@ -33,6 +35,8 @@ class ApidocServiceProvider extends ServiceProvider
                 ApidocCommand::class,
                 ApidocMdCommand::class,
                 InstallCommand::class,
+                ApiDocRequestCommand::class,
+                ApiDocResponseCommand::class,
             ]);
         }
     }

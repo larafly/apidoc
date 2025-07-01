@@ -54,8 +54,55 @@ return [
 
 在`.env`中配置`GENERATOR_AUTHOR=您的名字`，来进行创建人的配置
 
+### 生成Request
+
+使用命令行生成Request类
+
+```sh
+php artisan apidoc:request UserRequest
+```
+
+如果您继承分页的类`PageApiRequest`，可以加上`--p`
+
+```sh
+php artisan apidoc:request UserRequest --p
+```
+
+### 生成Response
+
+使用命令行生成Response类
+
+```sh
+php artisan apidoc:response UserResponse
+```
+
+如果您继承分页的类`PaginateResponse`，可以加上`--p`
+
+```sh
+php artisan apidoc:response UserResponse --p
+```
+
+### 生成命令
+
+1. 文档写入数据库,运行如下命令
+
+```shell
+php artisan apidoc
+```
+
+生成完毕后,访问`http://localhost:8000/apidoc` 即可看到生成的文档，如生成的有问题，可检查相关接口配置是否定义好
+
+
+2. 文档写入`markdown`文件中,可运行如下命令
+
+```shell
+php artisan apidoc:md
+```
+
+生成完毕后,访问`storage/app/public/apidoc` 即可看到生成的文档文件
+
 ## 更新记录
 
-查看 [changelog](changelog.md) 获取更新记录
+查看 [changelog](https://apidoc.pp-lang.tech/guide/start/changelog.html) 获取更新记录
 
 MIT. Please see the [license file](license.md) for more information.
