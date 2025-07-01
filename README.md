@@ -3,7 +3,7 @@
 </p>
 
 # Laravel Apidoc
-## [中文文档](README_zh_CN.md))
+## [中文文档](README_zh_CN.md)
 
 Laravel Apidoc is an API documentation generation tool based on [Laravel](https://laravel.com/).
 
