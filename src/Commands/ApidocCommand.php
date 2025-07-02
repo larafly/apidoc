@@ -12,7 +12,6 @@ use Larafly\Apidoc\Requests\ApiRequest;
 use Larafly\Apidoc\Responses\ApiResponse;
 use Larafly\Apidoc\Responses\PaginateResponse;
 use Larafly\Apidoc\Utils\ReflectionUtil;
-use Larafly\Apidoc\Utils\RouteUtil;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -89,7 +88,7 @@ class ApidocCommand extends Command
         $groupName = $groupAttrInstance->name ?? '';
         $parent_name = $groupAttrInstance->parent_name ?? '';
         $module = $groupAttrInstance->module ?? '';
-        if(!$module){
+        if (! $module) {
             $module = $this->getModule($controller);
         }
 
@@ -108,14 +107,14 @@ class ApidocCommand extends Command
 
     /**
      * get current controller module
-     * @param $controllerClass
+     *
      * @return string module
      */
     public function getModule($controllerClass): string
     {
         $parts = explode('\\', $controllerClass);
 
-        return $parts[count($parts) - 2]??'Default';
+        return $parts[count($parts) - 2] ?? 'Default';
     }
 
     private function buildMethodDoc(ReflectionClass $reflection, array $info): ?array
@@ -178,7 +177,7 @@ class ApidocCommand extends Command
 
     public function saveControllerDoc(array $api): void
     {
-        $apidoc_type = $this->saveGroup($api['module'],$api['name'], $api['parent_name']);
+        $apidoc_type = $this->saveGroup($api['module'], $api['name'], $api['parent_name']);
 
         foreach ($api['api_methods'] as $method) {
             $record = LaraflyApidoc::firstOrNew([
@@ -324,7 +323,7 @@ class ApidocCommand extends Command
     /**
      * save api doc type
      */
-    private function saveGroup(string $module,string $group, string $parent_name): LaraflyApidocType
+    private function saveGroup(string $module, string $group, string $parent_name): LaraflyApidocType
     {
         $segments = explode('/', $group);
 
@@ -332,13 +331,15 @@ class ApidocCommand extends Command
 
         $parent_id = 0;
         // parent type deal
-        if (!empty($parent_name)) {
+        if (! empty($parent_name)) {
             $parentSegments = explode('/', $parent_name);
             foreach ($parentSegments as $name) {
                 $name = trim($name);
-                if ($name === '') continue;
+                if ($name === '') {
+                    continue;
+                }
                 $type = LaraflyApidocType::firstOrNew(
-                    ['name' => $name, 'parent_id' => $parent_id,'module' => $module]
+                    ['name' => $name, 'parent_id' => $parent_id, 'module' => $module]
                 );
                 $type->save();
 
@@ -352,7 +353,7 @@ class ApidocCommand extends Command
                 continue;
             }
             $type = LaraflyApidocType::firstOrNew(
-                ['name' => $name, 'parent_id' => $parent_id,'module' => $module]
+                ['name' => $name, 'parent_id' => $parent_id, 'module' => $module]
             );
             $type->save();
             $parent_id = $type->id;

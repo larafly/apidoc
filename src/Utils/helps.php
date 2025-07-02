@@ -6,12 +6,10 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 if (! function_exists('dump_json')) {
     /**
      * local print pretty json
-     * @param mixed $data
-     * @return void
      */
     function dump_json(mixed $data): void
     {
-        if (env('DUMP_JSON',true)) {
+        if (env('DUMP_JSON', true)) {
             $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
             $output = new ConsoleOutput;
 
