@@ -35,7 +35,10 @@
         "psr-4": {
             "Larafly\\Apidoc\\": "src/",
             "Larafly\\Apidoc\\Database\\Factories\\": "database/factories/"
-        }
+        },
+        "files": [
+            "src/Utils/helps.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

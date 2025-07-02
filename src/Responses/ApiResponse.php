@@ -36,6 +36,11 @@ class ApiResponse implements Responsable
 
     public static function success(mixed $data): static
     {
+        // if data is string , use message to return data
+        if (is_string($data)) {
+            return new static(message: $data);
+        }
+
         return new static(data: $data);
     }
 
@@ -87,7 +92,7 @@ class ApiResponse implements Responsable
                 }
                 $meta = $attrs[0]->newInstance();
                 $type = $meta->type;
-                if (class_exists($type) && is_subclass_of($type, __CLASS__)) {
+                if (is_string($type) && class_exists($type) && is_subclass_of($type, __CLASS__)) {
                     if ($model->$name instanceof Collection) {
                         // get current type collection reflect models
                         $args[$name] = $model->$name->map(fn (Model $item) => $type::fromModel($item));

@@ -17,7 +17,8 @@ return new class extends Migration
             $table->increments('id');
             $table->string('name')->comment('name');
             $table->integer('parent_id')->comment('parent id')->default(0);
-            $table->string('alias')->unique()->comment('alias');
+            $table->string('module')->comment('module');
+            $table->unique(['name','parent_id','module'], 'name_module_unique');
             $table->timestamps();
         });
         Schema::create('larafly_apidocs', function (Blueprint $table) {

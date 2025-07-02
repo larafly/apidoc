@@ -24,7 +24,8 @@ class ApidocMdCommand extends ApidocCommand
     public function saveControllerDoc(array $api): void
     {
         $groupName = $api['name'];
-        $folder = "apidoc/{$groupName}";
+        $module = $api['module'];
+        $folder = "apidoc/{$module}/{$groupName}";
 
         foreach ($api['api_methods'] as $method) {
             $markdown = $this->buildMarkdownDoc($method);

@@ -2,35 +2,38 @@
 
 namespace Larafly\Apidoc\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Larafly\Apidoc\Models\LaraflyApidocType;
 
 class ApidocController
 {
-    public function index(Request $request)
+    public function index(?string $module = null)
     {
         // The production environment does not display API documentation by default.
         if (App::isProduction() && ! config('larafly-apidoc.is_show')) {
             abort(404);
         }
-        $locale = $request->get('locale') ?? config('app.locale', 'en');
+        $locale = request()->get('locale') ?? config('app.locale', 'en');
         if (! in_array($locale, ['en', 'zh_CN'])) {
             $locale = 'en';
         }
         App::setLocale($locale);
-        $tree = $this->buildApidocTree();
+        $tree = $this->buildApidocTree($module);
 
         return view('larafly-apidoc::index', compact('tree'));
     }
 
-    public function buildApidocTree($parentId = 0): array
+    public function buildApidocTree($module, $parent_id = 0): array
     {
-        $types = LaraflyApidocType::where('parent_id', $parentId)->get();
+        $query = LaraflyApidocType::whereParentId($parent_id);
+        if ($module) {
+            $query = $query->whereModule($module);
+        }
+        $types = $query->get();
 
         return $types->map(function ($type) {
             // Get child types recursively
-            $childrenTypes = $this->buildApidocTree($type->id);
+            $childrenTypes = $this->buildApidocTree($type->module, $type->id);
 
             // Get api docs under this type
             $docs = $type->larafly_apidocs->map(function ($doc) {

@@ -85,9 +85,13 @@ class ApidocCommand extends Command
         if (! $groupAttr) {
             return null;
         }
-
-        $groupName = $groupAttr->newInstance()->name ?? '';
-        $alias = RouteUtil::getControllerAlias($controller);
+        $groupAttrInstance = $groupAttr->newInstance();
+        $groupName = $groupAttrInstance->name ?? '';
+        $parent_name = $groupAttrInstance->parent_name ?? '';
+        $module = $groupAttrInstance->module ?? '';
+        if(!$module){
+            $module = $this->getModule($controller);
+        }
 
         $apiMethods = collect($methods)->map(function ($info) use ($reflection) {
             return $this->buildMethodDoc($reflection, $info);
@@ -95,10 +99,23 @@ class ApidocCommand extends Command
 
         return [
             'name' => $groupName,
-            'alias' => $alias,
+            'parent_name' => $parent_name,
+            'module' => strtolower($module),
             'controller' => $controller,
             'api_methods' => $apiMethods,
         ];
+    }
+
+    /**
+     * get current controller module
+     * @param $controllerClass
+     * @return string module
+     */
+    public function getModule($controllerClass): string
+    {
+        $parts = explode('\\', $controllerClass);
+
+        return $parts[count($parts) - 2]??'Default';
     }
 
     private function buildMethodDoc(ReflectionClass $reflection, array $info): ?array
@@ -161,10 +178,7 @@ class ApidocCommand extends Command
 
     public function saveControllerDoc(array $api): void
     {
-        $apidoc_type = $this->saveGroup($api['name'], $api['alias']);
-        if (! $apidoc_type->save()) {
-            return;
-        }
+        $apidoc_type = $this->saveGroup($api['module'],$api['name'], $api['parent_name']);
 
         foreach ($api['api_methods'] as $method) {
             $record = LaraflyApidoc::firstOrNew([
@@ -310,33 +324,40 @@ class ApidocCommand extends Command
     /**
      * save api doc type
      */
-    private function saveGroup(string $group, string $alias): LaraflyApidocType
+    private function saveGroup(string $module,string $group, string $parent_name): LaraflyApidocType
     {
         $segments = explode('/', $group);
-        $parentId = 0;
+
         $type = null;
 
-        foreach ($segments as $segment) {
-            $segment = trim($segment);
-            if ($segment === '') {
+        $parent_id = 0;
+        // parent type deal
+        if (!empty($parent_name)) {
+            $parentSegments = explode('/', $parent_name);
+            foreach ($parentSegments as $name) {
+                $name = trim($name);
+                if ($name === '') continue;
+                $type = LaraflyApidocType::firstOrNew(
+                    ['name' => $name, 'parent_id' => $parent_id,'module' => $module]
+                );
+                $type->save();
+
+                $parent_id = $type->id;
+            }
+        }
+        // children type deal
+        foreach ($segments as $name) {
+            $name = trim($name);
+            if ($name === '') {
                 continue;
             }
-
-            // Build unique alias path like: "parent", "parent_child", etc.
-            $fullAlias = $parentId === 0 ? $alias : $alias.'_'.$segment;
-
-            // Save or update node
-            $type = LaraflyApidocType::updateOrCreate(
-                ['alias' => $fullAlias],
-                [
-                    'name' => $segment,
-                    'parent_id' => $parentId,
-                ]
+            $type = LaraflyApidocType::firstOrNew(
+                ['name' => $name, 'parent_id' => $parent_id,'module' => $module]
             );
-
-            $parentId = $type->id;
+            $type->save();
+            $parent_id = $type->id;
         }
 
-        return $type; // Return the deepest (last) level
+        return $type;
     }
 }
